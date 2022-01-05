@@ -1,7 +1,7 @@
 project(
   'jack-example-tools',
   ['c', 'cpp'],
-  meson_version: '>=0.50.0',
+  meson_version: '>=0.58.0',
   license: ['GPL2+'],
   version: '0.1.0',
 )
@@ -24,6 +24,18 @@ endif
 dep_alsa = dependency('alsa', version: '>=1.0.18', required: alsa_required)
 dep_jack = dependency('jack')
 jack_version = dep_jack.version()
+jack_implementation = ''
+jack_implemetnation = dep_jack.get_variable('jack_implementation')
+if jack_implementation == 'pipewire'
+  message('Pipewire JACK implementation detected.')
+elif jack_implementation == 'jack2'
+  message('Jack2 JACK implementation detected.')
+elif jack_implementation == 'jack1'
+  message('Jack1 JACK implementation detected.')
+else
+  error('No compatible jack implementation found! Requires either jack1 >= 0.126.0, jack2 >= 1.9.20 or pipewire-jack >= 0.3.43.')
+endif
+
 lib_jackserver = cc.find_library('jackserver', required: true)
 lib_jacknet = cc.find_library('jacknet', required: get_option('jack_net'))
 dep_opus = dependency('opus', version: '>=0.9.0', required: get_option('opus_support'))
@@ -92,11 +104,11 @@ c_args_common = [
   '-D__PROJECT_VERSION__="@0@"'.format(conf_data.get('VERSION')),
 ]
 
-if jack_version.version_compare('>=0.109.0') and jack_version.version_compare('<0.200.0')
+if jack_implementation == 'jack1'
   message('Detected jack1 compatible headers')
   c_args_common += ['-D__JACK1__']
 endif
-if (jack_version.version_compare('>=0.58') and jack_version.version_compare('<=0.71')) or jack_version.version_compare('>=1.9.0')
+if jack_implementation == 'jack2' or jack_implementation == 'pipewire'
   message('Detected jack2 compatible headers')
   c_args_common += ['-D__JACK2__']
 endif
