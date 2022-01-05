@@ -33,7 +33,7 @@ elif jack_implementation == 'jack2'
 elif jack_implementation == 'jack1'
   message('Jack1 JACK implementation detected.')
 else
-  error('No compatible jack implementation found! Requires either jack1 >= 0.126.0, jack2 >= 1.9.20 or pipewire-jack >= 0.3.43.')
+  error('No compatible jack implementation found! Requires either jack1 >= 0.126.0, jack2 >= 1.9.20 or pipewire-jack >= 0.3.44.')
 endif
 
 lib_jackserver = cc.find_library('jackserver', required: true)
